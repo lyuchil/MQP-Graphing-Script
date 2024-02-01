@@ -42,7 +42,7 @@ def graphing(log_file_path, pm_file_path, graph_title):
     interframeTimeDe = interframeTimeDe.iloc[1:, :]
 
     figures, axis = plt.subplots(3,2)
-
+    figures.tight_layout(rect=[0, 0.03, 1, 0.95])
     figures.suptitle(graph_title)
 
     # plotting queue size graph
