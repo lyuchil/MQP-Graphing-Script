@@ -1,5 +1,5 @@
 import time
-
+import subprocess
 import pydirectinput
 
 
@@ -29,16 +29,22 @@ if __name__ == '__main__':
     # wait for benchmark to start
     time.sleep(10.0)
 
-    # start pm capture ctrl + shift + 1
-    pydirectinput.keyDown('ctrl')
-    pydirectinput.keyDown('shift')
-    pydirectinput.keyDown('1')
-    pydirectinput.keyUp('ctrl')
-    pydirectinput.keyUp('shift')
-    pydirectinput.keyUp('1')
+    # start presentmon logging
+    print('started presentmon capture')
+    s1 = subprocess.Popen('python presentmon.py')
 
+    # # start pm capture ctrl + shift + 1
+    # pydirectinput.keyDown('ctrl')
+    # pydirectinput.keyDown('shift')
+    # pydirectinput.keyDown('1')
+    # pydirectinput.keyUp('ctrl')
+    # pydirectinput.keyUp('shift')
+    # pydirectinput.keyUp('1')
+
+    
     # wait for capture to end
-    time.sleep(62.0)
+    time.sleep(32.0)
+    print('capture ended')
     # exit benchmark and end stream
     pydirectinput.press('esc')
     time.sleep(0.5)
