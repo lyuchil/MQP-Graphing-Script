@@ -61,5 +61,8 @@ rename_logger_file(pm_source_folder, current_label_value, pm_final_folder)
 # update value in config.json
 new_value = config['label'] + 1
 update_json(config_json, "label", new_value)
-save_config(config_json, config)
+
+
+
+
 
