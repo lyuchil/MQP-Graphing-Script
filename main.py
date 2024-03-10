@@ -9,41 +9,21 @@ if __name__ == '__main__':
 
     # open admin command prompt before running the script 
     # otherwise everything crashes
-    tempVal = 0
-    for _ in range(5):
-        tempVal = 0
-        f = open("tag.txt", "r+")
-        tempVal = int(f.readline())
-        
-        print(type(tempVal))
-        f.close()
+  
+    # launches moonlight
+    s1 = subprocess.Popen('python open_moonlight.py')
+    s1.wait()
 
-        f = open("tag.txt", "w")
-        tempVal = tempVal+1
-        tempValString = str(tempVal)
-        f.write(tempVal)
+    # make sure moonlight stream is open
+    time.sleep(5)
 
-        f.close()
-    
+    # opens benchmark in wt
+    s2 = subprocess.Popen('test_binds.py')
+    s2.wait()
 
-
-
-    
-
-    # # launches moonlight
-    # s1 = subprocess.Popen('python open_moonlight.py')
-    # s1.wait()
-
-    # # make sure moonlight stream is open
-    # time.sleep(5)
-
-    # # opens benchmark in wt
-    # s2 = subprocess.Popen('python war_thunder_keybinds.py')
-    # s2.wait()
-
-    # # rename and match files
-    # s3 = subprocess.Popen('python match_file.py')  
-    # s3.wait()
+    # rename and match files
+    s3 = subprocess.Popen('python match_file.py')  
+    s3.wait()
 
 
     #for loop

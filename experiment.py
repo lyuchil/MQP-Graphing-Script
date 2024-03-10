@@ -55,7 +55,7 @@ def process_csv(file_path):
     data_std = data['msBetweenDisplayChange'].std()
     late_count = 0
     for time in data['msBetweenDisplayChange']:
-        if time > data_mean:
+        if time > data_mean + data_std:
             late_count += 1
 
 
