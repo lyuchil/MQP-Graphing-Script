@@ -10,21 +10,26 @@ if __name__ == '__main__':
     # open admin command prompt before running the script 
     # otherwise everything crashes
   
-    # launches moonlight
-    s1 = subprocess.Popen('python open_moonlight.py')
-    s1.wait()
+    for _ in range(3):
+        # launches moonlight
+        s1 = subprocess.Popen('python open_moonlight.py')
+        s1.wait()
 
-    # make sure moonlight stream is open
-    time.sleep(5)
+        # make sure moonlight stream is open
+        time.sleep(5)
 
-    # opens benchmark in wt
-    s2 = subprocess.Popen('test_binds.py')
-    s2.wait()
+        # opens benchmark in wt
+        s2 = subprocess.Popen('python war_thunder_keybinds.py')
+        s2.wait()
 
-    # rename and match files
-    s3 = subprocess.Popen('python match_file.py')  
-    s3.wait()
+        # make sure moonlight is closed so that we can access the fie 
+        os.system("taskkill /f /im  Moonlight.exe")
+        time.sleep(5)
 
+        # rename and match files
+        s3 = subprocess.Popen('python match_file.py')  
+        s3.wait()
+        time.sleep(5)
 
     #for loop
 

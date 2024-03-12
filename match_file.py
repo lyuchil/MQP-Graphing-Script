@@ -5,11 +5,11 @@ config_json = 'config.json'
 
 # some globals for basic settings 
 # can rearrange these into the config file and change before each run (currnetly listed for testing pruposes)
-logger_source_folder = "C:/MQP/logger_output_loc_1"
-pm_source_folder = "C:/MQP/pm_folder_1"
+logger_source_folder = "C:/Users/claypool/Desktop/log_file_output_new"
+pm_source_folder = "C:/Users/claypool/Desktop/my_test/graph_script/MQP-Graphing-Script/presentmon_testing"
 
-logger_final_folder = "C:/MQP/logger_output_loc_2"
-pm_final_folder = "C:/MQP/pm_folder_2"
+logger_final_folder = "C:/Users/claypool/Desktop/local_logger_mqp23-24"
+pm_final_folder = "C:/Users/claypool/Desktop/pm_logger_mqp_23-24"
 
 
 def load_json(file_path):
@@ -32,7 +32,7 @@ def add_tag(file_path, tag, destination_folder):
     base_path, file_name = os.path.split(file_path)
     file_name, file_extension = os.path.splitext(file_name)
 
-    new_file_name = f"{file_name}_{tag}{file_extension}"
+    new_file_name = f"{file_name}%_{tag}{file_extension}"
     new_file_path = os.path.join(destination_folder, new_file_name)
 
     return new_file_path
