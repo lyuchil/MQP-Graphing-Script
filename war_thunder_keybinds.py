@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     
     # wait for capture to end
-    time.sleep(12.0)
+    time.sleep(32.0)
     print('capture ended')
     # exit benchmark and end stream
     pydirectinput.press('esc')

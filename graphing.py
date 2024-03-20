@@ -5,6 +5,8 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+
 # initalizing the parser 
 parser = argparse.ArgumentParser(
     prog='Dashboard Generator',
@@ -17,7 +19,31 @@ parser.add_argument('--pm')
 parser.add_argument('--title')
 
 
+def get_file_and_tag(file_name):
+    file_creation_time, tag = file_name.split("%")
+    return file_creation_time, tag
+
+
+def sync(pm, log):
+    
+    log_name, extension1 = get_file_and_tag(log)
+    pm_name, extension2 = get_file_and_tag(pm)
+
+
+    log_time = log_name.split("\\").pop()
+    pm_time = pm_name.split("\\").pop()
+
+ 
+    return int(pm_time) - int(log_time)
+
+
 def graphing(log_file_path, pm_file_path, graph_title):
+
+    time_sync = sync(pm_file_path, log_file_path)
+
+    time_end = time_sync + 30_000
+
+    print(time_sync, time_end)
 
     # loading file according to file type
     if log_file_path.endswith(".csv"):
@@ -28,15 +54,21 @@ def graphing(log_file_path, pm_file_path, graph_title):
     # load PresentMon Data
     pm_data = pd.read_csv(pm_file_path)
 
+    # time sync
+
+    synced_data = data.loc[(data['time (ms)'] >= time_sync) & (data['time (ms)'] <= time_end)]    
+    
+
     # removing NAN values
-    queueSize = data[['time (ms)', 'queueSize']].dropna()
-    sleepValue = data[['time (ms)','sleepValue']].dropna()
-    interframeTimeEn = data[['time (ms)','interFrameTimeEnqueue']].dropna()
-    interframeTimeDe = data[['time (ms)','interFrameTimeDequeue']].dropna()
-    intended_sleep = data[['time (ms)','average_slp']].dropna()
-    actual_sleep = data[['time (ms)','actualSleepTime']].dropna()
+    queueSize = synced_data[['time (ms)', 'queueSize']].dropna()
+    sleepValue = synced_data[['time (ms)','sleepValue']].dropna()
+    interframeTimeEn = synced_data[['time (ms)','interFrameTimeEnqueue']].dropna()
+    interframeTimeDe = synced_data[['time (ms)','interFrameTimeDequeue']].dropna()
+    intended_sleep = synced_data[['time (ms)','average_slp']].dropna()
+    actual_sleep = synced_data[['time (ms)','actualSleepTime']].dropna()
     pm_interframe_time = pm_data[['TimeInSeconds','msBetweenDisplayChange']]
-   
+
+
     # remove inital interframe time 
     interframeTimeEn = interframeTimeEn.iloc[1:, :]
     interframeTimeDe = interframeTimeDe.iloc[1:, :]
@@ -66,8 +98,8 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[2,0].set_title('Sleep value')
 
     # plotting intended sleep vs actual sleep
-    axis[2,1].plot("time (ms)", "average_slp", data=intended_sleep)
-    axis[2,1].plot("time (ms)", "actualSleepTime", data=actual_sleep)
+    axis[2,1].plot("time (ms)", "average_slp", color="red", data=intended_sleep)
+    axis[2,1].plot("time (ms)", "actualSleepTime",color="blue" ,data=actual_sleep)
     axis[2,1].set_title('Intended vs Actual Sleep')
 
     plt.show()
@@ -89,5 +121,6 @@ if __name__ == "__main__":
     
 
     graphing(args.log, args.pm, args.title)
+    #sync(args.pm, args.log)
 
     

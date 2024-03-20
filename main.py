@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # open admin command prompt before running the script 
     # otherwise everything crashes
   
-    for _ in range(3):
+    for _ in range(1):
         # launches moonlight
         s1 = subprocess.Popen('python open_moonlight.py')
         s1.wait()
@@ -30,6 +30,10 @@ if __name__ == '__main__':
         s3 = subprocess.Popen('python match_file.py')  
         s3.wait()
         time.sleep(5)
+
+
+        s4 = subprocess.Popen('python auto_graph.py')  
+        #s4.wait()
 
     #for loop
 
