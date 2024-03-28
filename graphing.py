@@ -64,21 +64,24 @@ def graphing(log_file_path, pm_file_path, graph_title):
 
     # removing NAN values
     queueSize = synced_data[['time (ms)', 'queueSize']].dropna()
-    # sleep_offset = synced_data[['time (ms)','sleep_offset']].dropna()
+    sleep_offset = synced_data[['time (ms)','sleep_offset']].dropna()
     interframeTimeEn = synced_data[['time (ms)','interFrameTimeEnqueue']].dropna()
     interframeTimeDe = synced_data[['time (ms)','interFrameTimeDequeue']].dropna()
     intended_sleep = synced_data[['time (ms)','average_slp']].dropna()
     actual_sleep = synced_data[['time (ms)','actualSleepTime']].dropna()
-    pm_interframe_time = pm_data[['TimeInSeconds','msBetweenDisplayChange']]
-
-    average_queue_size = synced_data.loc[:, 'queueSize'].mean()
-    average_interframe_time = pm_data['msBetweenDisplayChange'].mean()
-    std_interframe_time = pm_data['msBetweenDisplayChange'].std()
+    pm_interframe_time = pm_data[['TimeInSeconds','msBetweenPresents']]
  
-    interrupt_boolean = pm_data['msBetweenDisplayChange'] > (average_interframe_time + std_interframe_time)
 
-    interrupt_count = interrupt_boolean.sum()
-  
+    average_queue_size = queueSize['queueSize'].mean()
+    
+    double_standard_frame_time = 1 / 30 * 1_000
+    
+    pm = pm_data['msBetweenPresents']
+    interrupt_boolean = pm > double_standard_frame_time
+    interrupt_frame_time = pm[interrupt_boolean]
+    interrupt_count = interrupt_boolean.sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+    magnitude = (interrupt_frame_time - double_standard_frame_time).sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+
 
 
     # remove inital interframe time 
@@ -90,17 +93,19 @@ def graphing(log_file_path, pm_file_path, graph_title):
                                          mtrans.IdentityTransform())
     figures.tight_layout(rect=[0, 0.03, 1, 0.95])
     figures.suptitle(graph_title)
-    txt = figures.text(.5, 20, f"Average Queue Size: {average_queue_size}", ha='center')
-    txt2 = figures.text(.5, 5, f"Interrupts: {interrupt_count}", ha='center')
+    txt = figures.text(.5, 40, f"Average Queue Size: {average_queue_size}", ha='center')
+    txt2 = figures.text(.5, 25, f"Interrupts: {interrupt_count} /s", ha='center')
+    txt3 = figures.text(.5, 10, f"Magnitude: {magnitude} ms/s", ha='center')
     txt.set_transform(trans)
     txt2.set_transform(trans)
+    txt3.set_transform(trans)
 
     # plotting queue size graph
     axis[0,0].plot("time (ms)", "queueSize", data=queueSize)
     axis[0,0].set_title('Queue Size')
 
     # plotting PresentMon interframe time 
-    axis[0,1].plot('TimeInSeconds', 'msBetweenDisplayChange', data=pm_interframe_time)
+    axis[0,1].plot('TimeInSeconds', 'msBetweenPresents', data=pm_interframe_time)
     axis[0,1].set_title('PresentMon Interframe Time')
 
     # plotting interframe time enqueue 
@@ -112,8 +117,8 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[1,1].set_title('Interframe Time Dequeue')
 
     # plotting sleep value
-    # axis[2,0].plot("time (ms)", "sleep_offset", data=sleep_offset)
-    # axis[2,0].set_title('sleep_offset')
+    axis[2,0].plot("time (ms)", "sleep_offset", data=sleep_offset)
+    axis[2,0].set_title('sleep_offset')
 
     # plotting intended sleep vs actual sleep
     axis[2,1].plot("time (ms)", "average_slp", color="red", data=intended_sleep)
