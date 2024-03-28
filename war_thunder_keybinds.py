@@ -3,7 +3,6 @@ import subprocess
 import pydirectinput
 
 
-
 if __name__ == '__main__':
     pydirectinput.FAILSAFE = False
     # moving to correct location
@@ -43,7 +42,7 @@ if __name__ == '__main__':
 
     
     # wait for capture to end
-    time.sleep(32.0)
+    time.sleep(67.0)
     print('capture ended')
     # exit benchmark and end stream
     pydirectinput.press('esc')

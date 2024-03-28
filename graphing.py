@@ -4,7 +4,7 @@ import os
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import matplotlib.transforms as mtrans
 
 
 # initalizing the parser 
@@ -41,7 +41,7 @@ def graphing(log_file_path, pm_file_path, graph_title):
 
     time_sync = sync(pm_file_path, log_file_path)
 
-    time_end = time_sync + 30_000
+    time_end = time_sync + 60_000
 
     print(time_sync, time_end)
 
@@ -56,17 +56,29 @@ def graphing(log_file_path, pm_file_path, graph_title):
 
     # time sync
 
+    # data_sleep_off_set = data[['time (ms)','sleep_offset']].dropna()
+    # data_sleep = data[['time (ms)','actualSleepTime']].dropna()
+    # data_asleep = data[['time (ms)','average_slp']].dropna()
     synced_data = data.loc[(data['time (ms)'] >= time_sync) & (data['time (ms)'] <= time_end)]    
     
 
     # removing NAN values
     queueSize = synced_data[['time (ms)', 'queueSize']].dropna()
-    sleepValue = synced_data[['time (ms)','sleepValue']].dropna()
+    # sleep_offset = synced_data[['time (ms)','sleep_offset']].dropna()
     interframeTimeEn = synced_data[['time (ms)','interFrameTimeEnqueue']].dropna()
     interframeTimeDe = synced_data[['time (ms)','interFrameTimeDequeue']].dropna()
     intended_sleep = synced_data[['time (ms)','average_slp']].dropna()
     actual_sleep = synced_data[['time (ms)','actualSleepTime']].dropna()
     pm_interframe_time = pm_data[['TimeInSeconds','msBetweenDisplayChange']]
+
+    average_queue_size = synced_data.loc[:, 'queueSize'].mean()
+    average_interframe_time = pm_data['msBetweenDisplayChange'].mean()
+    std_interframe_time = pm_data['msBetweenDisplayChange'].std()
+ 
+    interrupt_boolean = pm_data['msBetweenDisplayChange'] > (average_interframe_time + std_interframe_time)
+
+    interrupt_count = interrupt_boolean.sum()
+  
 
 
     # remove inital interframe time 
@@ -74,8 +86,14 @@ def graphing(log_file_path, pm_file_path, graph_title):
     interframeTimeDe = interframeTimeDe.iloc[1:, :]
 
     figures, axis = plt.subplots(3,2)
+    trans = mtrans.blended_transform_factory(figures.transFigure,
+                                         mtrans.IdentityTransform())
     figures.tight_layout(rect=[0, 0.03, 1, 0.95])
     figures.suptitle(graph_title)
+    txt = figures.text(.5, 20, f"Average Queue Size: {average_queue_size}", ha='center')
+    txt2 = figures.text(.5, 5, f"Interrupts: {interrupt_count}", ha='center')
+    txt.set_transform(trans)
+    txt2.set_transform(trans)
 
     # plotting queue size graph
     axis[0,0].plot("time (ms)", "queueSize", data=queueSize)
@@ -94,8 +112,8 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[1,1].set_title('Interframe Time Dequeue')
 
     # plotting sleep value
-    axis[2,0].plot("time (ms)", "sleepValue", data=sleepValue)
-    axis[2,0].set_title('Sleep value')
+    # axis[2,0].plot("time (ms)", "sleep_offset", data=sleep_offset)
+    # axis[2,0].set_title('sleep_offset')
 
     # plotting intended sleep vs actual sleep
     axis[2,1].plot("time (ms)", "average_slp", color="red", data=intended_sleep)

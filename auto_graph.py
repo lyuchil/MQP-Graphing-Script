@@ -14,9 +14,11 @@ def get_recent_file(folder_path):
 pm = get_recent_file(pm_folder)
 log = get_recent_file(log_folder)
 
+title = "test-test"
 
 
-commandline = f'python graphing.py --log {log} --pm {pm} --title test'
+
+commandline = f'python graphing.py --log {log} --pm {pm} --title {title}'
 
 s1 = subprocess.Popen(commandline)
 
