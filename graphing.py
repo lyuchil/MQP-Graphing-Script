@@ -36,8 +36,15 @@ def sync(pm, log):
  
     return int(pm_time) - int(log_time)
 
+def scaling(column):
+    min = column.min()
+    max = column.max()
 
-def graphing(log_file_path, pm_file_path, graph_title):
+    return ((column - min) / (max - min)) * 60
+
+
+
+def dashboard(log_file_path, pm_file_path, graph_title):
 
     time_sync = sync(pm_file_path, log_file_path)
 
@@ -129,6 +136,97 @@ def graphing(log_file_path, pm_file_path, graph_title):
 
 
 
+def graphing(log_file_path, pm_file_path, graph_title):
+    time_sync = sync(pm_file_path, log_file_path)
+
+    time_end = time_sync + 60_000
+
+    print(time_sync, time_end)
+
+    # loading file according to file type
+    if log_file_path.endswith(".csv"):
+        data = pd.read_csv(log_file_path)
+    elif log_file_path.endswith(".xlsx"):
+        data = pd.read_excel(log_file_path)
+
+    # load PresentMon Data
+    pm_data = pd.read_csv(pm_file_path)
+
+    # time sync
+    synced_data = data.loc[(data['time (ms)'] >= time_sync) & (data['time (ms)'] <= time_end)]    
+    
+
+    # removing NAN values
+    queueSize = synced_data[['time (ms)', 'queueSize']].dropna()
+    interframeTimeEn = synced_data[['time (ms)','interFrameTimeEnqueue']].dropna()
+    interframeTimeDe = synced_data[['time (ms)','interFrameTimeDequeue']].dropna()
+ 
+
+    average_queue_size = queueSize['queueSize'].mean()
+    double_standard_frame_time = 1 / 30 * 1_000
+    
+    pm = pm_data['msBetweenPresents']
+    interrupt_boolean = pm > double_standard_frame_time
+    interrupt_frame_time = pm[interrupt_boolean]
+    interrupt_count = interrupt_boolean.sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+    magnitude = (interrupt_frame_time - double_standard_frame_time).sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+
+
+    # remove inital interframe time 
+    interframeTimeEn = interframeTimeEn.iloc[1:, :]
+    interframeTimeDe = interframeTimeDe.iloc[1:, :]
+
+    # recalibration and scaling
+    queueSize['time (ms)'] = scaling(queueSize['time (ms)'])
+
+    interframeTimeEn['time (ms)'] = scaling(interframeTimeEn['time (ms)'])
+    interframeTimeEn['interFrameTimeEnqueue'] = interframeTimeEn['interFrameTimeEnqueue'] / 1000
+
+    interframeTimeDe['time (ms)'] = scaling(interframeTimeDe['time (ms)'])
+    interframeTimeDe['interFrameTimeDequeue'] = interframeTimeDe['interFrameTimeDequeue'] / 1000
+
+    figures, axis = plt.subplots(3,1, figsize=(10,5))
+    trans = mtrans.blended_transform_factory(figures.transFigure,
+                                         mtrans.IdentityTransform())
+    figures.tight_layout(rect=[0, 0.02, 1, 0.95])
+    figures.suptitle(graph_title)
+    txt = figures.text(.5, 40, f"Average Queue Size: {average_queue_size}", ha='center')
+    txt2 = figures.text(.5, 25, f"Interrupts: {interrupt_count} /s", ha='center')
+    txt3 = figures.text(.5, 10, f"Magnitude: {magnitude} ms/s", ha='center')
+    txt.set_transform(trans)
+    txt2.set_transform(trans)
+    txt3.set_transform(trans)
+
+    # plotting queue size graph
+    axis[0].plot("time (ms)", "queueSize", data=queueSize, color='Green')
+    axis[0].set_title('Queue Size')
+    axis[0].set_xlim(0, 60)
+    axis[0].set_ylim(0, 18)
+    axis[0].set_xlabel('Time (s)')
+    axis[0].set_ylabel('Frames')
+
+   
+    # plotting interframe time enqueue 
+    axis[1].plot("time (ms)", "interFrameTimeEnqueue", data=interframeTimeEn, color='Maroon')
+    axis[1].set_title('Frame Time Enqueue')
+    axis[1].set_xlim(0, 60)
+    axis[1].set_ylim(0, 100)
+    axis[1].set_xlabel('Time (s)')
+    axis[1].set_ylabel('Frame Time (ms)')
+
+
+
+    # plotting interframe time dequeue
+    axis[2].plot("time (ms)", "interFrameTimeDequeue", data=interframeTimeDe, color='Navy')
+    axis[2].set_title('Frame Time Dequeue')
+    axis[2].set_xlim(0, 60)
+    axis[2].set_ylim(0, 100)
+    axis[2].set_xlabel('Time (s)')
+    axis[2].set_ylabel('Frame Time (ms)')
+
+    plt.show()
+
+
 
 
 if __name__ == "__main__":
@@ -143,6 +241,7 @@ if __name__ == "__main__":
         parser.error("PresentMon file does not exist. Please check the input path")
     
 
+    #dashboard(args.log, args.pm, args.title)
     graphing(args.log, args.pm, args.title)
     #sync(args.pm, args.log)
 
