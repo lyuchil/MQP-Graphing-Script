@@ -237,8 +237,6 @@ def graphing(log_file_path, pm_file_path, graph_title):
     plt.subplots_adjust(hspace=0.1)
 
 
-
-
     plt.show()
 
 
