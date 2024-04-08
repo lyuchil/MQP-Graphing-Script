@@ -189,10 +189,10 @@ def graphing(log_file_path, pm_file_path, graph_title):
     trans = mtrans.blended_transform_factory(figures.transFigure,
                                          mtrans.IdentityTransform())
     figures.tight_layout(rect=[0, 0.02, 1, 0.99])
-    figures.suptitle(graph_title, fontsize=12, fontweight='bold')
-    txt = figures.text(0.15, 25, f"Average Queue Size: {average_queue_size}", ha='center', fontsize=12)
-    txt2 = figures.text(.5, 25, f"Interrupts: {interrupt_count} /s", ha='center', fontsize=12)
-    txt3 = figures.text(.8, 25, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=12)
+    figures.suptitle(graph_title, fontsize=18, fontweight='bold')
+    txt = figures.text(0.15, 15, f"Average Queue Size: {average_queue_size}", ha='center', fontsize=18)
+    txt2 = figures.text(.5, 15, f"Interrupts: {interrupt_count} /s", ha='center', fontsize=18)
+    txt3 = figures.text(.8, 15, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=18)
     txt.set_transform(trans)
     txt2.set_transform(trans)
     txt3.set_transform(trans)
@@ -204,7 +204,7 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[0].set_xlim(0, 60)
     axis[0].set_ylim(0, 100)
     #axis[1].set_xlabel('Time (s)')
-    axis[0].set_ylabel('Frame Time (ms)', fontsize=12)
+    axis[0].set_ylabel('Frame Time (ms)', fontsize=18)
 
 
     # plotting queue size graph
@@ -213,7 +213,7 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[1].set_xlim(0, 60)
     axis[1].set_ylim(0, 18)
     #axis[0].set_xlabel('Time (s)')
-    axis[1].set_ylabel('Frames', fontsize=12)
+    axis[1].set_ylabel('Frames', fontsize=18)
 
 
     # plotting interframe time dequeue
@@ -221,17 +221,17 @@ def graphing(log_file_path, pm_file_path, graph_title):
     #axis[2].set_title('Dequeue')
     axis[2].set_xlim(0, 60)
     axis[2].set_ylim(0, 100)
-    axis[2].set_xlabel('Time (s)', fontsize=12)
-    axis[2].set_ylabel('Frame Time (ms)', fontsize=12)
+    axis[2].set_xlabel('Time (s)', fontsize=18)
+    axis[2].set_ylabel('Frame Time (ms)', fontsize=18)
 
-    figures.text(0.98, 0.8, 'Enqueue', ha='center', va='center', rotation=-90, fontsize=12)
-    figures.text(0.98, 0.5, 'Queue Size', ha='center', va='center', rotation=-90, fontsize=12)
-    figures.text(0.98, 0.2, 'Dequeue', ha='center', va='center', rotation=-90, fontsize=12)
+    figures.text(0.98, 0.8, 'Enqueue', ha='center', va='center', rotation=-90, fontsize=18)
+    figures.text(0.98, 0.5, 'Queue Size', ha='center', va='center', rotation=-90, fontsize=18)
+    figures.text(0.98, 0.2, 'Dequeue', ha='center', va='center', rotation=-90, fontsize=18)
 
 
     for ax in axis:
-        ax.tick_params(axis='x', labelsize=14)
-        ax.tick_params(axis='y', labelsize=14)
+        ax.tick_params(axis='x', labelsize=18)
+        ax.tick_params(axis='y', labelsize=18)
 
 
     plt.subplots_adjust(hspace=0.1)
@@ -260,21 +260,26 @@ def base_graphing(log_file_path, pm_file_path, graph_title):
     interrupt_count = interrupt_boolean.sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
     magnitude = (interrupt_frame_time - double_standard_frame_time).sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
 
-    plt.title('Moonlight No Jitter', fontweight='bold', fontsize=14)
+    plt.title('Moonlight 100 ms Jitter', fontweight='bold', fontsize=18)
 
     plt.plot(pm_data['TimeInSeconds'], pm_data['msBetweenPresents'])
 
-    plt.xlabel('Time (s)', fontsize=12)
-    plt.ylabel('Frame Time (ms)', fontsize=12)
+    plt.xlabel('Time (s)', fontsize=18)
+    plt.ylabel('Frame Time (ms)', fontsize=18)
 
     xlabel_pos = plt.gca().xaxis.get_label().get_position()
 
+    # for nj
+    # plt.text(xlabel_pos[0] + 5, xlabel_pos[1] - 10, f"Interrupts: {interrupt_count} /s", fontsize=18)
+    # plt.text(xlabel_pos[0] + 50, xlabel_pos[1] - 10, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=18)
+    
 
-    plt.text(xlabel_pos[0] + 10, xlabel_pos[1] - 8, f"Interrupts: {interrupt_count} /s", fontsize=12)
-    plt.text(xlabel_pos[0] + 40, xlabel_pos[1] - 8, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=12)
+    # for jitter
+    plt.text(xlabel_pos[0] + 5, xlabel_pos[1] - 20, f"Interrupts: {interrupt_count} /s", fontsize=18)
+    plt.text(xlabel_pos[0] + 50, xlabel_pos[1] - 20, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=18)
 
-    plt.tick_params(axis='x', labelsize=12)  # Adjust labelsize as needed
-    plt.tick_params(axis='y', labelsize=12)
+    plt.tick_params(axis='x', labelsize=18)  # Adjust labelsize as needed
+    plt.tick_params(axis='y', labelsize=18)
 
     plt.show()
 
