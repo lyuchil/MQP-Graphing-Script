@@ -4,11 +4,13 @@ import os
 import pandas as pd 
 
 # paths and folders
-logger_files = os.listdir("C:/MQP/logger_output_loc_2")
-pm_files = os.listdir("C:/MQP/pm_folder_2")
 
-logger_folder = "C:/MQP/logger_output_loc_2"
-pm_folder = "C:/MQP/pm_folder_2"
+logger_folder = sys.argv[1]
+pm_folder = sys.argv[2]
+
+logger_files = os.listdir(logger_folder)
+pm_files = os.listdir(pm_folder)
+
 
 # results array
 results = []

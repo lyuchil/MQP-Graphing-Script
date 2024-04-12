@@ -1,5 +1,7 @@
 import os
 import json
+import sys
+
 
 config_json = 'config.json'
 
@@ -8,8 +10,8 @@ config_json = 'config.json'
 logger_source_folder = "C:/Users/claypool/Desktop/log_file_output_new"
 pm_source_folder = "C:/Users/claypool/Desktop/my_test/graph_script/MQP-Graphing-Script/presentmon_testing"
 
-logger_final_folder = "C:/Users/claypool/Desktop/local_logger_mqp23-24"
-pm_final_folder = "C:/Users/claypool/Desktop/pm_logger_mqp_23-24"
+logger_final_folder = sys.argv[1]
+pm_final_folder = sys.argv[2]
 
 
 def load_json(file_path):

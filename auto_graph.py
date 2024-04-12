@@ -15,7 +15,7 @@ pm = get_recent_file(pm_folder)
 log = get_recent_file(log_folder)
 
 # manually change it 
-title = "E-Policy-QMon-NJ"
+title = "E-Policy-100ms"
 
 commandline = f'python graphing.py --log {log} --pm {pm} --title {title}'
 
