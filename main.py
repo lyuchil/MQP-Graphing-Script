@@ -30,19 +30,21 @@ def update_json(file_path, key, new_value):
 config_json = 'config.json'
 config = load_json(config_json)
 
-jitter_settings = ["no", "low", "medium", "high"]
+jitter_settings = ["medium"]
 
 policies = ["base", "E", "E-Q10", "E-Q2"]
 
 if __name__ == '__main__':
 
-  
     # open admin command prompt before running the script 
     # otherwise everything crashes
     for setting in jitter_settings:
         for policy in policies:
        
-            print(f"Crrently Running {setting} jitter with {policy} policy")
+            ss = subprocess.Popen('python C:/Users/claypool/Desktop/auto_play/jitter_stop.py')
+            ss.wait()
+
+            print(f"Currently Running {setting} jitter with {policy} policy")
 
             if setting == "no":
                 sJ = subprocess.Popen('python C:/Users/claypool/Desktop/auto_play/jitter_stop.py')
@@ -73,13 +75,15 @@ if __name__ == '__main__':
 
             print(f"Starting benchmark for {policy} policy")
 
-            logger_result_folder = f"{policy}-{setting}"
-            pm_logger_result_folder = f"pm-{policy}-{setting}" 
+            logger_result_folder = f"{policy}-{setting}-new"
+            pm_logger_result_folder = f"pm-{policy}-{setting}-new" 
 
             os.mkdir(logger_result_folder)
             os.mkdir(pm_logger_result_folder)
 
-            for _ in range(50):
+            for i in range(50):
+
+                print(f"Run {i} for {policy} policy at {setting} setting")
 
                 # launches moonlight
                 if policy == "base":
@@ -90,7 +94,6 @@ if __name__ == '__main__':
                     s1 = subprocess.Popen('python open_moonlight.py')
                     s1.wait()
                     print("Opened Moonlight")
-
 
                 
                 # make sure moonlight stream is open

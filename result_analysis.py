@@ -20,6 +20,8 @@ policy_folders = [folder for folder in os.listdir(directory) if os.path.isdir(os
 #     # Remove "base moonlight" folder from the list
 #     policy_folders.remove("Base Moonlight")
 
+
+
 # Step 3: Define a color palette for policies
 color_palette = plt.cm.tab10.colors  # You can use any colormap, or define your own list of colors
 
@@ -62,7 +64,7 @@ for policy_folder in policy_folders:
         
             # Calculate mean and confidence interval
             mean = data[column].mean()
-            confidence = 1.96 * data[column].sem()  # 95% confidence interval
+            confidence = 1.96 * data[column].std() / np.sqrt(50)  # 95% confidence interval
         
             # Store mean and confidence interval for the setting
             data_points.append((setting, mean, confidence))
@@ -106,7 +108,7 @@ for policy_folder, data_points in all_data_points.items():
     
     # Plot data points and error bars
     for setting, mean, confidence in data_points:
-        plt.errorbar(setting, mean, yerr=confidence, fmt='o', color=color, label=policy_folder, ecolor=color, linewidth=2.5,capsize=10)
+        plt.errorbar(setting, mean, yerr=confidence, fmt='o', color=color, label=policy_folder, ecolor='black', linewidth=2.5,capsize=10)
     
     # Extract x values (settings), y values (means), and error values (confidence intervals) from data_points
     x_values = [setting for setting, _, _ in data_points]

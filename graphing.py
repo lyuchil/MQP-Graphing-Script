@@ -191,8 +191,8 @@ def graphing(log_file_path, pm_file_path, graph_title):
     figures.tight_layout(rect=[0, 0.02, 1, 0.99])
     figures.suptitle(graph_title, fontsize=18, fontweight='bold')
     txt = figures.text(0.15, 15, f"Average Queue Size: {average_queue_size}", ha='center', fontsize=18)
-    txt2 = figures.text(.5, 15, f"Interrupts: {interrupt_count} /s", ha='center', fontsize=18)
-    txt3 = figures.text(.8, 15, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=18)
+    txt2 = figures.text(.7, 15, f"Interrupts: {interrupt_count} /s", ha='center', fontsize=18)
+    txt3 = figures.text(.9, 15, f"Magnitude: {magnitude} ms/s", ha='center', fontsize=18)
     txt.set_transform(trans)
     txt2.set_transform(trans)
     txt3.set_transform(trans)
@@ -224,14 +224,14 @@ def graphing(log_file_path, pm_file_path, graph_title):
     axis[2].set_xlabel('Time (s)', fontsize=18)
     axis[2].set_ylabel('Frame Time (ms)', fontsize=18)
 
-    figures.text(0.98, 0.8, 'Enqueue', ha='center', va='center', rotation=-90, fontsize=18)
-    figures.text(0.98, 0.5, 'Queue Size', ha='center', va='center', rotation=-90, fontsize=18)
-    figures.text(0.98, 0.2, 'Dequeue', ha='center', va='center', rotation=-90, fontsize=18)
+    figures.text(0.98, 0.8, 'Enqueue', ha='center', va='center', rotation=-90, fontsize=24)
+    figures.text(0.98, 0.5, 'Queue Size', ha='center', va='center', rotation=-90, fontsize=24)
+    figures.text(0.98, 0.2, 'Dequeue', ha='center', va='center', rotation=-90, fontsize=24)
 
 
     for ax in axis:
-        ax.tick_params(axis='x', labelsize=18)
-        ax.tick_params(axis='y', labelsize=18)
+        ax.tick_params(axis='x', labelsize=24)
+        ax.tick_params(axis='y', labelsize=24)
 
 
     plt.subplots_adjust(hspace=0.1)
@@ -252,6 +252,7 @@ def base_graphing(log_file_path, pm_file_path, graph_title):
     # load PresentMon Data
     pm_data = pd.read_csv(pm_file_path)
 
+
     double_standard_frame_time = 1 / 30 * 1_000
     
     pm = pm_data['msBetweenPresents']
@@ -260,7 +261,7 @@ def base_graphing(log_file_path, pm_file_path, graph_title):
     interrupt_count = interrupt_boolean.sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
     magnitude = (interrupt_frame_time - double_standard_frame_time).sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
 
-    plt.title('Moonlight 100 ms Jitter', fontweight='bold', fontsize=18)
+    plt.title(graph_title, fontweight='bold', fontsize=18)
 
     plt.plot(pm_data['TimeInSeconds'], pm_data['msBetweenPresents'])
 
@@ -284,6 +285,80 @@ def base_graphing(log_file_path, pm_file_path, graph_title):
     plt.show()
 
 
+def methodology_graphing(log_file_path, pm_file_path, graph_title):
+  
+    # # loading file according to file type
+    # if log_file_path.endswith(".csv"):
+    #     data = pd.read_csv(log_file_path)
+    # elif log_file_path.endswith(".xlsx"):
+    #     data = pd.read_excel(log_file_path)
+
+    # # load PresentMon Data
+    # pm_data = pd.read_csv(pm_file_path)
+
+    # double_standard_frame_time = 1 / 30 * 1_000
+    
+    # pm = pm_data['msBetweenPresents']
+    # interrupt_boolean = pm > double_standard_frame_time
+    # interrupt_frame_time = pm[interrupt_boolean]
+    # interrupt_count = interrupt_boolean.sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+    # magnitude = (interrupt_frame_time - double_standard_frame_time).sum() / (pm_data['TimeInSeconds'].iloc[-1] - pm_data['TimeInSeconds'].iloc[0])
+
+
+    tomb_raider_data = pd.read_csv(log_file_path)
+    war_thunder_data = pd.read_csv(pm_file_path)
+    geometry_dash_data = pd.read_csv(graph_title)
+
+
+
+
+    figures, axis = plt.subplots(3,1, figsize=(10,5), sharex=True)
+    figures.tight_layout(rect=[0, 0.02, 1, 0.99])
+    figures.suptitle(graph_title, fontsize=18, fontweight='bold')
+
+    # plotting interframe time enqueue 
+    axis[0].plot( tomb_raider_data['TimeInSeconds'],  tomb_raider_data['msBetweenPresents'], color='blue')
+    #axis[0].set_title('Enqueue', loc='right')
+    axis[0].set_xlim(0, 60)
+    axis[0].set_ylim(0, 100)
+    #axis[1].set_xlabel('Time (s)')
+    axis[0].set_ylabel('Frame Time (ms)', fontsize=18)
+
+
+    # plotting queue size graph
+    axis[1].plot(war_thunder_data['TimeInSeconds'], war_thunder_data['msBetweenPresents'], color='blue')
+    #axis[1].set_title('Queue Size')
+    axis[1].set_xlim(0, 60)
+    axis[1].set_ylim(0, 18)
+    #axis[0].set_xlabel('Time (s)')
+    axis[1].set_ylabel('Frames', fontsize=18)
+
+
+    # plotting interframe time dequeue
+    axis[2].plot(geometry_dash_data['TimeInSeconds'], geometry_dash_data['msBetweenPresents'], color='blue')
+    #axis[2].set_title('Dequeue')
+    axis[2].set_xlim(0, 60)
+    axis[2].set_ylim(0, 100)
+    axis[2].set_xlabel('Time (s)', fontsize=18)
+    axis[2].set_ylabel('Frame Time (ms)', fontsize=18)
+
+    figures.text(0.98, 0.8, 'TR', ha='center', va='center', rotation=-90, fontsize=24)
+    figures.text(0.98, 0.5, 'WT', ha='center', va='center', rotation=-90, fontsize=24)
+    figures.text(0.98, 0.2, 'GD', ha='center', va='center', rotation=-90, fontsize=24)
+
+
+    for ax in axis:
+        ax.tick_params(axis='x', labelsize=24)
+        ax.tick_params(axis='y', labelsize=24)
+
+
+    plt.subplots_adjust(hspace=0.1)
+
+
+
+    plt.show()
+
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -298,8 +373,9 @@ if __name__ == "__main__":
     
 
     #dashboard(args.log, args.pm, args.title)
-    graphing(args.log, args.pm, args.title)
-    #base_graphing(args.log, args.pm, args.title)
+    #graphing(args.log, args.pm, args.title)
+    base_graphing(args.log, args.pm, args.title)
     #sync(args.pm, args.log)
+    #methodology_graphing(args.log, args.pm, args.title)
 
     
